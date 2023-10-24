@@ -2,60 +2,58 @@ part of '../../../main.dart';
 
 class FruitCatcher extends FlameGame with HasCollisionDetection, HasDraggables {
   Shopper shopper = Shopper();
-  int get level => (_score ~/ 15).round();
+  int get level => lastScore.score ~/ 15;
   int get spawnSec =>
       (2000 - (level * 100)) < 200 ? 200 : (2000 - (level * 100));
   double get gravity => level == 0 ? 1.5 : (1.5 + level / 100);
-  int _score = 0;
-  onCollide() {
-    _score++;
+  void onCollide() {
+    lastScore.score++;
     FlameAudio.play('beep.mp3');
-    createPlusOnetext(shopper.position.x, shopper.position.y);
+    createPlusOneText(shopper.position.x, shopper.position.y);
   }
 
-  Score _lastScore = Score.empty();
-  Score get lastScore => _lastScore;
+  Score lastScore = Score.empty();
   double _playingTimeInSec = 0;
   String get playingTimeString => secToMs(_playingTimeInSec.toInt());
-  int get score => _score;
   final ValueNotifier<bool> isPlaying = ValueNotifier<bool>(false);
   bool gameOver = false;
-
   void startBgmMusic() {
-    if (!kIsWeb) {
-      FlameAudio.bgm.initialize();
-      FlameAudio.bgm.play('game_loop.mp3');
-    }
+    FlameAudio.bgm.initialize();
+    FlameAudio.bgm.play('game_loop.mp3');
   }
 
-  play() {
+  void play() {
     FlameAudio.bgm.stop();
     overlays.remove('menu');
     isPlaying.value = true;
     gameOver = false;
   }
 
-  reset() {
-    _lastScore = Score(
-        timePassed: _playingTimeInSec.toInt(), level: level, score: score);
-    _score = 0;
+  void reset() {
+    lastScore = Score(
+      timePassed: _playingTimeInSec.toInt(),
+      level: level,
+      score: 0,
+    );
     gameOver = true;
   }
 
-  playAgain() {
+  void playAgain() {
     overlays.remove('gameover');
-    _score = 0;
+
     _playingTimeInSec = 0;
     gameOver = false;
     isPlaying.value = true;
   }
 
-  gameOverF() {
+  void gameOverF() {
     FlameAudio.play('game_over.mp3');
     gameOver = true;
     isPlaying.value = false;
-    for (var element in children) {
-      if (element is Fruit) remove(element);
+    for (final element in children) {
+      if (element is Fruit) {
+        remove(element);
+      }
     }
     overlays.add('gameover');
     startBgmMusic();
@@ -64,9 +62,13 @@ class FruitCatcher extends FlameGame with HasCollisionDetection, HasDraggables {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(shopper);
-    isPlaying.addListener(() => spawnItems());
-    addAll([ScoreText()]);
+    addAll([shopper, ScoreText()]);
+    isPlaying.addListener(() async {
+      while (isPlaying.value && !gameOver) {
+        add(Fruit());
+        await Future.delayed(Duration(milliseconds: spawnSec));
+      }
+    });
     startBgmMusic();
   }
 
@@ -78,21 +80,14 @@ class FruitCatcher extends FlameGame with HasCollisionDetection, HasDraggables {
     }
   }
 
-  void createPlusOnetext(x, y) {
-    var text = PlusOneText()..position = Vector2(x, y);
+  void createPlusOneText(double x, double y) {
+    final text = PlusOneText()..position = Vector2(x, y);
     add(text);
     Future.delayed(const Duration(seconds: 1), () => remove(text));
   }
 
-  void spawnItems() async {
-    while (isPlaying.value && !gameOver) {
-      add(Fruit());
-      await Future.delayed(Duration(milliseconds: spawnSec));
-    }
-  }
-
   @override
-  backgroundColor() => const Color(0xffF5EADE);
+  Color backgroundColor() => const Color(0xffF5EADE);
 }
 
 class Score {

@@ -6,15 +6,17 @@ class Shopper extends SpriteComponent
   Future<void> onLoad() async {
     sprite = await gameRef.loadSprite('shopper.png');
     size = Vector2.all(156);
-    add(RectangleHitbox(
-      size: Vector2(size.x / 2, size.y / 2),
-      position: position + Vector2(size.x / 10, size.y / 2),
-    ));
+    add(
+      RectangleHitbox(
+        size: Vector2(size.x / 2, size.y / 2),
+        position: position + Vector2(size.x / 10, size.y / 2),
+      ),
+    );
     position = Vector2(gameRef.size.x / 2 - 156 / 2, gameRef.size.y - 200);
   }
 
   @override
-  bool onDragStart(info) => false;
+  bool onDragStart(DragStartInfo info) => false;
 
   @override
   bool onDragUpdate(DragUpdateInfo info) {

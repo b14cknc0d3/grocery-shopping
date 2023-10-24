@@ -5,9 +5,9 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flame_game/game/utils/utils.dart';
 import 'package:flutter/material.dart' hide Draggable;
-import 'game/utils/utils.dart';
+
 part './game/fruit_catcher.dart';
 part './game/menu/game_menu.dart';
 part './game/sprites/fruites.dart';
@@ -17,18 +17,22 @@ part './game/sprites/texts.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final game = FruitCatcher();
-  var menu = {
-    'menu': ((context, game) => GameOverMenu(game: game, gameOver: false))
+  final menu = {
+    'menu': (context, game) =>
+        GameOverMenu(game: game as FruitCatcher, gameOver: false),
+    'gameover': (context, game) =>
+        GameOverMenu(game: game as FruitCatcher, gameOver: true),
   };
-  var gameOverMenu = {
-    'gameover': (context, game) => GameOverMenu(game: game, gameOver: true)
-  };
-  runApp(SafeArea(
-    child: GameWidget<FruitCatcher>(
-        loadingBuilder: (_) =>
-            const Center(child: CircularProgressIndicator.adaptive()),
+
+  runApp(
+    SafeArea(
+      child: GameWidget<FruitCatcher>(
         game: game,
         initialActiveOverlays: const ['menu'],
-        overlayBuilderMap: {...menu, ...gameOverMenu}),
-  ));
+        overlayBuilderMap: {
+          ...menu,
+        },
+      ),
+    ),
+  );
 }
