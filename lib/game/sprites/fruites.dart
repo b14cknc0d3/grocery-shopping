@@ -2,21 +2,19 @@ part of '../../../main.dart';
 
 class Fruit extends SpriteComponent
     with HasGameRef<FruitCatcher>, CollisionCallbacks {
-  static const List<String> _fruitPaths = [
+  static const _fruitPaths = [
     'apple.png',
     'donut.png',
     'grape.png',
     'ice-cream.png',
-    'organe.png',
+    'organe.png'
   ];
-  bool _isHealthyFood = false;
-  bool get isHealthyFood => _isHealthyFood;
-
+  bool isHealthyFood = false;
   Vector2 velocity = Vector2(0, 0);
   @override
   Future<void> onLoad() async {
     int fruitIndex = Random().nextInt(_fruitPaths.length);
-    _isHealthyFood = fruitIndex != 3 && fruitIndex != 1;
+    isHealthyFood = fruitIndex != 3 && fruitIndex != 1;
     String randomPath = _fruitPaths[fruitIndex];
     sprite = await gameRef.loadSprite(randomPath);
     size = Vector2.all(42);

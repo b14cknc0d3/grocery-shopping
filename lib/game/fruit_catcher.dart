@@ -66,7 +66,7 @@ class FruitCatcher extends FlameGame with HasCollisionDetection, HasDraggables {
     super.onLoad();
     add(shopper);
     isPlaying.addListener(() => spawnItems());
-    addAll([ScoreText(), TimmerText()]);
+    addAll([ScoreText()]);
     startBgmMusic();
   }
 
